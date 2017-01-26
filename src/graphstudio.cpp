@@ -267,6 +267,8 @@ BOOL CgraphstudioApp::InitInstance()
 
 	// call DragAcceptFiles only if there's a suffix
 	//  In an SDI app, this should occur after ProcessShellCommand
+
+	view->OnFileSaveasxml();
 	return TRUE;
 }
 
@@ -330,7 +332,7 @@ void CgraphstudioApp::OnAppAbout()
 
 int CgraphstudioApp::ExitInstance()
 {
-    CMediaInfo::FreeInfoCache();
+	CMediaInfo::FreeInfoCache();
 
     int ret = __super::ExitInstance();
     if (m_nExitCode != 0)
