@@ -15,7 +15,7 @@ public:
 
     // aditional flags
     bool m_bRunGraph;
-	bool m_bSaveXmlGraph;
+    bool m_bSaveXmlGraph;
     bool m_bExitAfterRun;
     bool m_bExitOnError;
     bool m_bNoClock;
@@ -26,7 +26,7 @@ public:
 
     bool m_bRemoteGraph;
     CString m_strRemoteGraph;
-	CString m_strSaveAsGraph;
+    CString m_strSaveAsGraph;
 
 protected:
     //Override for Base class virtual

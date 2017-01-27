@@ -17,10 +17,10 @@
 // Declare APIs for disabling user mode callback exception filter
 // See https://support.microsoft.com/en-us/kb/976038 KB 976038
 typedef BOOL WINAPI Sig_SetProcessUserModeExceptionPolicy(__in DWORD dwFlags);
-		BOOL WINAPI SetProcessUserModeExceptionPolicy(__in DWORD dwFlags);
+        BOOL WINAPI SetProcessUserModeExceptionPolicy(__in DWORD dwFlags);
 
 typedef BOOL WINAPI Sig_GetProcessUserModeExceptionPolicy(__out LPDWORD lpFlags);
-		BOOL WINAPI GetProcessUserModeExceptionPolicy(__out LPDWORD lpFlags);
+        BOOL WINAPI GetProcessUserModeExceptionPolicy(__out LPDWORD lpFlags);
 
 #define PROCESS_CALLBACK_FILTER_ENABLED     0x1
 
@@ -31,12 +31,12 @@ typedef BOOL WINAPI Sig_GetProcessUserModeExceptionPolicy(__out LPDWORD lpFlags)
 //-----------------------------------------------------------------------------
 
 BEGIN_MESSAGE_MAP(CgraphstudioApp, CWinApp)
-	ON_COMMAND(ID_APP_ABOUT, &CgraphstudioApp::OnAppAbout)
-	// Standard file based document commands
-	//ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
-	//ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
-	// Standard print setup command
-	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
+    ON_COMMAND(ID_APP_ABOUT, &CgraphstudioApp::OnAppAbout)
+    // Standard file based document commands
+    //ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
+    //ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
+    // Standard print setup command
+    ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
 END_MESSAGE_MAP()
 
 bool CgraphstudioApp::g_useInternalGrfParser    = false;
@@ -58,8 +58,8 @@ CgraphstudioApp::PinResolution CgraphstudioApp::g_ResolvePins = CgraphstudioApp:
 
 CgraphstudioApp::CgraphstudioApp()
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+    // TODO: add construction code here,
+    // Place all significant initialization in InitInstance
      
 #ifdef _WIN64
     SetAppID(_T("CPlusSharp.GraphStudioNext64"));
@@ -78,38 +78,38 @@ CgraphstudioApp theApp;
 
 BOOL CgraphstudioApp::InitInstance()
 {
-	// Disable user mode callback exception filter as this interferes with debugging
-	HMODULE kernel = LoadLibrary(_T("kernel32.dll"));
-	if (kernel) {
-		Sig_GetProcessUserModeExceptionPolicy * const getApi = (Sig_GetProcessUserModeExceptionPolicy*)GetProcAddress(kernel, "GetProcessUserModeExceptionPolicy");
-		Sig_SetProcessUserModeExceptionPolicy * const setApi = (Sig_SetProcessUserModeExceptionPolicy*)GetProcAddress(kernel, "SetProcessUserModeExceptionPolicy");
-		DWORD dwFlags = 0;
-		if (getApi && setApi && (*getApi)(&dwFlags)) {
-			(*setApi)(dwFlags & (~PROCESS_CALLBACK_FILTER_ENABLED)); 
-		}
-	}
+    // Disable user mode callback exception filter as this interferes with debugging
+    HMODULE kernel = LoadLibrary(_T("kernel32.dll"));
+    if (kernel) {
+        Sig_GetProcessUserModeExceptionPolicy * const getApi = (Sig_GetProcessUserModeExceptionPolicy*)GetProcAddress(kernel, "GetProcessUserModeExceptionPolicy");
+        Sig_SetProcessUserModeExceptionPolicy * const setApi = (Sig_SetProcessUserModeExceptionPolicy*)GetProcAddress(kernel, "SetProcessUserModeExceptionPolicy");
+        DWORD dwFlags = 0;
+        if (getApi && setApi && (*getApi)(&dwFlags)) {
+            (*setApi)(dwFlags & (~PROCESS_CALLBACK_FILTER_ENABLED)); 
+        }
+    }
 
-	INITCOMMONCONTROLSEX InitCtrls;
-	InitCtrls.dwSize = sizeof(InitCtrls);
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
-	InitCommonControlsEx(&InitCtrls);
+    INITCOMMONCONTROLSEX InitCtrls;
+    InitCtrls.dwSize = sizeof(InitCtrls);
+    InitCtrls.dwICC = ICC_WIN95_CLASSES;
+    InitCommonControlsEx(&InitCtrls);
 
     m_nExitCode = 0;
 
-	__super::InitInstance();
+    __super::InitInstance();
 
     EnableTaskbarInteraction(TRUE);
 
-	// Initialize OLE libraries
-	if (!AfxOleInit()) {
-		AfxMessageBox(IDP_OLE_INIT_FAILED);
-		return FALSE;
-	}
-	AfxEnableControlContainer();
-	AtlAxWinInit();
+    // Initialize OLE libraries
+    if (!AfxOleInit()) {
+        AfxMessageBox(IDP_OLE_INIT_FAILED);
+        return FALSE;
+    }
+    AfxEnableControlContainer();
+    AtlAxWinInit();
 
-	SetRegistryKey(_T("MONOGRAM"));
-	LoadStdProfileSettings(8);  // Load standard INI file options (including MRU)
+    SetRegistryKey(_T("MONOGRAM"));
+    LoadStdProfileSettings(8);  // Load standard INI file options (including MRU)
 
     // set exe location in registry
     TCHAR strExeLocation[MAX_PATH];
@@ -123,51 +123,51 @@ BOOL CgraphstudioApp::InitInstance()
         BOOL t = AfxGetApp()->WriteProfileStringW(_T(""),_T("exeLocation"), pathExe);
 #endif
 
-		// if grfx filetype is not registered jet, do it now
-		ATL::CRegKey regKey;
-		CString strRegFileType = _T(".grfx");
-		if (ERROR_SUCCESS != regKey.Open(HKEY_CLASSES_ROOT, strRegFileType, KEY_READ))
-			CCliOptionsForm::AssociateFileType();
+        // if grfx filetype is not registered jet, do it now
+        ATL::CRegKey regKey;
+        CString strRegFileType = _T(".grfx");
+        if (ERROR_SUCCESS != regKey.Open(HKEY_CLASSES_ROOT, strRegFileType, KEY_READ))
+            CCliOptionsForm::AssociateFileType();
     }
 
-	bool single_doc = false;
+    bool single_doc = false;
 
-	CDocTemplate* pDocTemplate = NULL;
+    CDocTemplate* pDocTemplate = NULL;
 
-	if (single_doc) {
-		pDocTemplate = new CSingleDocTemplate(
-			IDR_MAINFRAME,
-			RUNTIME_CLASS(CGraphDoc),
-			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-			RUNTIME_CLASS(CGraphView));
-	} else {
-		pDocTemplate = new CMultiDocTemplate(
-			IDR_MAINFRAME,
-			RUNTIME_CLASS(CGraphDoc),
-			RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-			RUNTIME_CLASS(CGraphView));
-	}
-	if (!pDocTemplate) return FALSE;
-	AddDocTemplate(pDocTemplate);
+    if (single_doc) {
+        pDocTemplate = new CSingleDocTemplate(
+            IDR_MAINFRAME,
+            RUNTIME_CLASS(CGraphDoc),
+            RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+            RUNTIME_CLASS(CGraphView));
+    } else {
+        pDocTemplate = new CMultiDocTemplate(
+            IDR_MAINFRAME,
+            RUNTIME_CLASS(CGraphDoc),
+            RUNTIME_CLASS(CMainFrame),       // main SDI frame window
+            RUNTIME_CLASS(CGraphView));
+    }
+    if (!pDocTemplate) return FALSE;
+    AddDocTemplate(pDocTemplate);
 
-	// Parse command line for standard shell commands, DDE, file open
-	ParseCommandLine(m_cmdInfo);
-	if (!ProcessShellCommand(m_cmdInfo)) return FALSE;
+    // Parse command line for standard shell commands, DDE, file open
+    ParseCommandLine(m_cmdInfo);
+    if (!ProcessShellCommand(m_cmdInfo)) return FALSE;
 
-	// The one and only window has been initialized, so show and update it
-	CMainFrame	*frame = (CMainFrame *)m_pMainWnd;
-	CGraphView	*view  = (CGraphView *)frame->GetActiveView();
+    // The one and only window has been initialized, so show and update it
+    CMainFrame	*frame = (CMainFrame *)m_pMainWnd;
+    CGraphView	*view  = (CGraphView *)frame->GetActiveView();
 
-	// initialize the graph
-	view->OnInit();
+    // initialize the graph
+    view->OnInit();
 
-	UINT showCmd = AfxGetApp()->GetProfileIntW(_T("Settings"), _T("ShowCmd"), SW_SHOWNORMAL);
-	if (showCmd != SW_SHOWMAXIMIZED)		// Allow only maximized and normal
-		showCmd = SW_SHOWNORMAL;
+    UINT showCmd = AfxGetApp()->GetProfileIntW(_T("Settings"), _T("ShowCmd"), SW_SHOWNORMAL);
+    if (showCmd != SW_SHOWMAXIMIZED)		// Allow only maximized and normal
+        showCmd = SW_SHOWNORMAL;
 
-	m_pMainWnd->ShowWindow(showCmd);
-	m_pMainWnd->UpdateWindow();
-	m_pMainWnd->SetFocus();
+    m_pMainWnd->ShowWindow(showCmd);
+    m_pMainWnd->UpdateWindow();
+    m_pMainWnd->SetFocus();
 
     // command line optionen
     if (m_cmdInfo.m_bExitOnError)
@@ -176,12 +176,12 @@ BOOL CgraphstudioApp::InitInstance()
     if (m_cmdInfo.m_bShowCliHelp)
         view->OnShowCliOptions();
 
-	// if we've been started with a command line parameter
-	// do open the file
-	if (m_cmdInfo.m_strFileName != _T("")) {
-		if (view->ShouldOpenInNewDocument(m_cmdInfo.m_strFileName))
-			view->OnNewClick();
-		view->TryOpenFile(m_cmdInfo.m_strFileName);
+    // if we've been started with a command line parameter
+    // do open the file
+    if (m_cmdInfo.m_strFileName != _T("")) {
+        if (view->ShouldOpenInNewDocument(m_cmdInfo.m_strFileName))
+            view->OnNewClick();
+        view->TryOpenFile(m_cmdInfo.m_strFileName);
 
         if (m_cmdInfo.m_bNoClock)
             view->RemoveClock();
@@ -200,33 +200,33 @@ BOOL CgraphstudioApp::InitInstance()
         view->OnNewClick();
         CComPtr<IRunningObjectTable>	rot;
         HRESULT hr = GetRunningObjectTable(0, &rot);
-	    if (FAILED(hr)) 
+        if (FAILED(hr)) 
         {
             // TODO Show error or exit?
         }
         else
         {
             CComPtr<IEnumMoniker>	emon;
-	        CComPtr<IMoniker>		moniker;
-	        CComPtr<IBindCtx>		bindctx;
-	        ULONG					f;
+            CComPtr<IMoniker>		moniker;
+            CComPtr<IBindCtx>		bindctx;
+            ULONG					f;
 
             hr = CreateBindCtx(0, &bindctx);
-	        if (FAILED(hr))
+            if (FAILED(hr))
             {
-		        // TODO Show error or exit?
-	        }
+                // TODO Show error or exit?
+            }
             else
             {
                 rot->EnumRunning(&emon);
-	            emon->Reset();
-	            while (emon->Next(1, &moniker, &f) == NOERROR)
+                emon->Reset();
+                while (emon->Next(1, &moniker, &f) == NOERROR)
                 {
                     bool found = false;
 
-		            // is this a graph object ?
-		            LPOLESTR displayname;
-		            moniker->GetDisplayName(bindctx, NULL, &displayname);
+                    // is this a graph object ?
+                    LPOLESTR displayname;
+                    moniker->GetDisplayName(bindctx, NULL, &displayname);
 
                     CString	name(displayname);
                     if (name.Find(m_cmdInfo.m_strRemoteGraph) == 0)
@@ -236,13 +236,13 @@ BOOL CgraphstudioApp::InitInstance()
                     }
 
                     if (displayname) {
-			            CComPtr<IMalloc>	alloc;
-			            if (SUCCEEDED(CoGetMalloc(0, &alloc))) {
-				            alloc->Free(displayname);
-			            }
-		            }
+                        CComPtr<IMalloc>	alloc;
+                        if (SUCCEEDED(CoGetMalloc(0, &alloc))) {
+                            alloc->Free(displayname);
+                        }
+                    }
 
-		            moniker = NULL;
+                    moniker = NULL;
 
                     if (found)
                         break;
@@ -265,11 +265,16 @@ BOOL CgraphstudioApp::InitInstance()
     if (m_cmdInfo.m_bShowFilters)
         view->OnGraphInsertFilter();
 
-	// call DragAcceptFiles only if there's a suffix
-	//  In an SDI app, this should occur after ProcessShellCommand
+    // call DragAcceptFiles only if there's a suffix
+    //  In an SDI app, this should occur after ProcessShellCommand
 
-	view->OnFileSaveasxml();
-	return TRUE;
+    if (m_cmdInfo.m_bSaveXmlGraph)
+    {
+        view->document_filename = m_cmdInfo.m_strSaveAsGraph;
+        view->document_type = view->XML;
+        view->DoFileSave();
+    }
+    return TRUE;
 }
 
 
@@ -279,27 +284,27 @@ BOOL CgraphstudioApp::InitInstance()
 class CAboutDlg : public CDialog
 {
 public:
-	CAboutDlg();
-	
-	GraphStudio::TitleBar		titlebar;
-	GraphStudio::URLLabel		url_label;
+    CAboutDlg();
+    
+    GraphStudio::TitleBar		titlebar;
+    GraphStudio::URLLabel		url_label;
 
 // Dialog Data
-	enum { IDD = IDD_ABOUTBOX };
+    enum { IDD = IDD_ABOUTBOX };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 // Implementation
 protected:
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 public:
     CString m_strVerInfo;
 };
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 {
-	m_strVerInfo.Format(_T("GraphStudioNext %s\n\n"), (LPCTSTR)CString(VER_FILE_VERSION_STR));
+    m_strVerInfo.Format(_T("GraphStudioNext %s\n\n"), (LPCTSTR)CString(VER_FILE_VERSION_STR));
     m_strVerInfo.Append(CString(VER_FILE_DESCRIPTION_STR));
 }
 
@@ -321,8 +326,8 @@ END_MESSAGE_MAP()
 // App command to run the dialog
 void CgraphstudioApp::OnAppAbout()
 {
-	CAboutDlg aboutDlg;
-	aboutDlg.DoModal();
+    CAboutDlg aboutDlg;
+    aboutDlg.DoModal();
 }
 
 
@@ -332,7 +337,7 @@ void CgraphstudioApp::OnAppAbout()
 
 int CgraphstudioApp::ExitInstance()
 {
-	CMediaInfo::FreeInfoCache();
+    CMediaInfo::FreeInfoCache();
 
     int ret = __super::ExitInstance();
     if (m_nExitCode != 0)

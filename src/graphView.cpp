@@ -12,7 +12,7 @@
 
 #include <io.h>
 #include <fcntl.h>
-#include "uglyglobalhack.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -1096,9 +1096,10 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 	filter +=	_T("All Graph Files|*.grf;*.grfx|");
 	filter +=	_T("All Files|*.*|");
 
-	
+	CFileDialog dlg(FALSE,NULL,NULL,OFN_OVERWRITEPROMPT|OFN_ENABLESIZING|OFN_PATHMUSTEXIST,filter);
+
 	// Pick initial type filter
-	
+	dlg.m_ofn.nFilterIndex = XML==input_type ? 1 : 2;
 
 	// make sure document extension is not set by default (e.g. if graph created by render media file)
 	CPath input_path(document_filename);
@@ -1106,14 +1107,14 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 
 	// set default name
 	CString input_filename = input_path;
+	dlg.m_ofn.lpstrFile = input_filename.GetBufferSetLength(MAX_PATH + 1);
+	dlg.m_ofn.nMaxFile = MAX_PATH + 1;
 
 	HRESULT hr = E_ABORT;
 
-	if (true) {
+	if (dlg.DoModal() == IDOK) {
 		document_type = GRF;
-		CgraphstudioApp* pFrame = (CgraphstudioApp*)AfxGetApp()->GetMainWnd();
-
-		CPath output_path = out_save_as_xml_path;
+		CPath output_path = dlg.GetPathName();
 		const CString output_extension = output_path.GetExtension();
 
 		// decide type of file to save
@@ -1125,7 +1126,7 @@ HRESULT CGraphView::FileSaveAs(DocumentType input_type)
 			// If XML extension, save as XML
 			document_type = XML;
 		} else if (output_extension.IsEmpty()) {
-			switch (1) {
+			switch (dlg.m_ofn.nFilterIndex) {
 			case 1:		document_type = XML;			break;
 			case 2:		document_type = GRF;			break;
 			default:	document_type = input_type;		break;	// ambigous, use type passed in

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "uglyglobalhack.h"
 
 CGraphStudioCommandLineInfo::CGraphStudioCommandLineInfo()
     :m_bRunGraph(false),
@@ -22,19 +21,18 @@ CGraphStudioCommandLineInfo::CGraphStudioCommandLineInfo()
 CGraphStudioCommandLineInfo::~CGraphStudioCommandLineInfo()
 {
 }
-CString out_save_as_xml_path;
+
 void CGraphStudioCommandLineInfo::ParseParam(const TCHAR *pszParam, BOOL bFlag, BOOL bLast)
 {
     if (bFlag)
     {
-		if (_tcsicmp(pszParam, TEXT("run")) == 0)
-			m_bRunGraph = true;
-		else if (_tcsnicmp(pszParam, TEXT("savexml"), 7) == 0)
-		{
-			m_bSaveXmlGraph = true;
-			m_strSaveAsGraph = CString(pszParam + 8);
-			out_save_as_xml_path = m_strSaveAsGraph;
-		}
+        if (_tcsicmp(pszParam, TEXT("run")) == 0)
+            m_bRunGraph = true;
+        else if (_tcsnicmp(pszParam, TEXT("savexml"), 7) == 0)
+        {
+            m_bSaveXmlGraph = true;
+            m_strSaveAsGraph = CString(pszParam + 8);
+        }
         else if (_tcsicmp(pszParam, TEXT("noclock")) == 0)
             m_bNoClock = true;
         else if (_tcsicmp(pszParam, TEXT("exitafterrun")) == 0)
